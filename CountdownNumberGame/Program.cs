@@ -22,9 +22,11 @@ namespace CountdownNumberGame
         static void PracticeMode()
         {
             GameNumbers numbers = new GameNumbers(10, 50);
-            Console.Clear();
 
             bool gameOver = false;
+
+            Console.Clear();
+            
             do
             {
                 numbers.ShowAll();
@@ -166,16 +168,20 @@ namespace CountdownNumberGame
             if(!CheckValidity(expression))
                 return null;
 
-            string noSpacesExpression = RemoveSpaces(expression);
-            List<string> tokens = Tokenize(noSpacesExpression);
+            try {
+                string noSpacesExpression = RemoveSpaces(expression);
+                List<string>  tokens = Tokenize(noSpacesExpression);
 
-            if (!CheckApplicableNumbers(tokens, guessNumbers))
+                if (!CheckApplicableNumbers(tokens, guessNumbers))
+                    return null;
+
+                List<string> postFix = InfixToPostfix(tokens);
+                int?  result = EvaluatePostfix(postFix);
+
+                return result;
+            }catch (Exception e) {
                 return null;
-
-            List<string> postFix = InfixToPostfix(tokens);
-            int? result = EvaluatePostfix(postFix);
-
-            return result;
+            }
         }
 
         static bool CheckValidity(string input)
@@ -313,9 +319,6 @@ namespace CountdownNumberGame
                     if (stack.Count < 2)
                     {
                         Console.WriteLine("Insufficient operands for operator: " + token);
-                        Console.WriteLine("Current stack contents:");
-                        foreach (double i in stack)
-                            Console.WriteLine(i);
 
                         throw new InvalidOperationException("Invalid postfix expression");
                     }
@@ -339,6 +342,7 @@ namespace CountdownNumberGame
                             t = a - b;
                             break;
                         default:
+                            Console.WriteLine("Invalid operator: " + token);
                             throw new InvalidOperationException("Invalid operator");
                     }
 
