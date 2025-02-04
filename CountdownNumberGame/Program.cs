@@ -96,6 +96,8 @@ namespace CountdownNumberGame
 
                         Console.WriteLine("You Shifted the numbers backward! But at the cost of 5 points.");
                         Console.WriteLine();
+
+                        shifted = true;
                     }
                     
 
@@ -179,7 +181,7 @@ namespace CountdownNumberGame
 
                 public void ReverseShift()
                 {
-                    numbers.RemoveAt(numbers.Count);
+                    numbers.RemoveAt(numbers.Count - 1);
                     numbers.Insert(0, null);
                 }
 
