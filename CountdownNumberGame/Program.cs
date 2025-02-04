@@ -2,6 +2,7 @@
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CountdownNumberGame
 {
@@ -13,6 +14,13 @@ namespace CountdownNumberGame
             game.Start();
         }
 
+        static Dictionary<ConsoleKey, int[]> data = new Dictionary<ConsoleKey, int[]>()
+            {
+                { ConsoleKey.P, new int[] {10, 50, 1, 11, 5, 1, 2, 2} },
+                { ConsoleKey.E, new int[] {10, 200, 1, 11, 4, 2, 2} },
+                { ConsoleKey.M, new int[] {100, 500, 1, 11, 4, 2, 1} },
+                { ConsoleKey.H, new int[] {100, 1000, 2, 11, 4, 1, 1} }
+            };
 
         class Game
         {
@@ -20,26 +28,10 @@ namespace CountdownNumberGame
 
             public void Start()
             {
-                Console.Write("Press Y for practice mode, any other key for the main game: ");
-                if (Console.ReadKey().Key == ConsoleKey.Y)
-                {
-                    PracticeMode();
-                }
-                else
-                {
-                    MainGame();
-                }
-            }
+                Console.Write("Press the key corresponding to the first letter of each difficulty (practice, easy, medium, hard: ");
+                ConsoleKey key = Console.ReadKey().Key;
 
-            private void MainGame()
-            {
-                Console.Clear();
-                Console.WriteLine("Main game mode is not implemented yet.");
-            }
-
-            private void PracticeMode()
-            {
-                GameNumbers numbers = new GameNumbers(10, 50);
+                GameNumbers numbers = new GameNumbers(data[key]);
                 bool gameOver = false;
 
                 Console.Clear();
@@ -66,8 +58,7 @@ namespace CountdownNumberGame
                             int removedNums = numbers.RemoveNumber((int)result);
                             if (result != null && removedNums != 0)
                             {
-                                Console.WriteLine("You deleted {0} number(s)! +{1} points!", removedNums, 10 * removedNums);
-                                Console.WriteLine();
+                                Console.WriteLine("You deleted {0} {1} time(s)! +{2} points!", result, removedNums, 10 * removedNums);
                             }else
                             {
                                 Console.WriteLine("the number {0} doesn't exist. -15 points.", result);
@@ -83,7 +74,7 @@ namespace CountdownNumberGame
 
                     shifted = numbers.Shift();
 
-                    numbers.guessNumbers = GenerateRandomList(1, 10, 6);
+                    numbers.RandomizeGuessNumbers();
 
                     if (!shifted)
                     {
@@ -91,7 +82,7 @@ namespace CountdownNumberGame
                     }
                 } while (!gameOver);
 
-
+                Console.Clear();
                 Console.WriteLine("Game Over!!");
                 Console.WriteLine();
                 Console.WriteLine("Final score: {0}", score);
@@ -103,40 +94,60 @@ namespace CountdownNumberGame
 
                 const int len = 20;
                 const int spaces = 5;
-                public int minValue;
-                public int maxValue;
+
+                public int numbersMin;
+                public int numbersMax;
+
+                public int guessMin;
+                public int guessMax;
+                public int small;
+                public int big;
+
+                public int shiftFrequency;
+                public int shiftCount = 0;
 
                 public List<int?> numbers = new List<int?>();
                 public List<int> guessNumbers = new List<int>();
 
-                public GameNumbers(int min, int max)
+                public GameNumbers(int[] values)
                 {
-                    minValue = min;
-                    maxValue = max;
+                    numbersMin = values[0];
+                    numbersMax = values[1];
+
+                    guessMin = values[2];
+                    guessMax = values[3];
+                    small = values[4];
+                    big = values[5];
+
+                    shiftFrequency = values[6];
 
                     for (int i = 0; i < len; i++)
                     {
                         if (i < spaces)
                             numbers.Add(null);
                         else
-                            numbers.Add(rand.Next(minValue, maxValue));
+                            numbers.Add(rand.Next(numbersMin, this.numbersMax));
                     }
 
-                    guessNumbers = GenerateRandomList(1, 10, 6);
+                    RandomizeGuessNumbers();
                 }
 
                 public bool Shift()
                 {
                     int lastIndex = numbers.LastIndexOf(null);
 
-                    if (lastIndex > -1)
+                    if(shiftCount % shiftFrequency == 0)
                     {
-                        numbers.RemoveAt(lastIndex);
-                        numbers.Add(rand.Next(minValue, maxValue));
+                        if (lastIndex > -1)
+                        {
+                            numbers.RemoveAt(lastIndex);
+                            numbers.Add(rand.Next(numbersMin, numbersMax));
+                        }
+                        else
+                            return false;
                     }
-                    else
-                        return false;
 
+                    shiftCount++;
                     return true;
 
                 }
@@ -176,6 +187,14 @@ namespace CountdownNumberGame
                     }
 
                     return count;
+                }
+
+                public void RandomizeGuessNumbers()
+                {
+                    List<int> smallList = GenerateRandomList(guessMin, guessMax, small);
+                    List<int> bigList = Enumerable.Range(0, big).Select(x => rand.Next(1, 5) * 25).ToList();
+
+                    guessNumbers = bigList.Concat(smallList).ToList();
                 }
             }
 
