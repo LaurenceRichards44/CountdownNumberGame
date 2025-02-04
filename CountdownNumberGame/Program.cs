@@ -33,6 +33,7 @@ namespace CountdownNumberGame
 
             private void MainGame()
             {
+                Console.Clear();
                 Console.WriteLine("Main game mode is not implemented yet.");
             }
 
@@ -61,13 +62,17 @@ namespace CountdownNumberGame
                     {
                         int? result = EvaluateExpression(equation, numbers.guessNumbers);
 
-                        int removedNums = numbers.RemoveNumber((int)result);
-                        if (result != null && removedNums != 0)
+                        if(result.HasValue)
                         {
-                            Console.WriteLine("You deleted {0} number(s)! +{1} points!", removedNums, 10 * removedNums);
-                            Console.WriteLine();
-                            removedNumber = true;
+                            int removedNums = numbers.RemoveNumber((int)result);
+                            if (result != null && removedNums != 0)
+                            {
+                                Console.WriteLine("You deleted {0} number(s)! +{1} points!", removedNums, 10 * removedNums);
+                                Console.WriteLine();
+                                removedNumber = true;
+                            }
                         }
+                        Console.WriteLine();
                     }else
                     {
                         score -= 15;
@@ -400,19 +405,28 @@ namespace CountdownNumberGame
             static bool CheckApplicableNumbers(List<string> tokens, List<int> guessNumbers)
             {
                 List<int> numbersInA = new List<int>();
+                List<int> numbersInB = new List<int>(guessNumbers);
+                List<int> removedNums = new List<int>();
+
                 foreach (var item in tokens)
                 {
                     if (int.TryParse(item, out int num))
                         numbersInA.Add(num);
                 }
 
-                foreach (var num in numbersInA)
+                foreach (int num in numbersInA)
                 {
-                    if (!guessNumbers.Contains(num))
+                    if (!numbersInB.Contains(num))
                     {
-                        Console.WriteLine("Invalid Expression, you may not use the number: {0}", num);
+                        Console.Write("Invalid Expression, you may not use the number {0}", num);
+
+                        if(removedNums.Contains(num))
+                            Console.WriteLine(" more than {0} time(s).", removedNums.Count(x => x == num));
+
                         return false;
                     }
+                    numbersInB.Remove(num);
+                    removedNums.Add(num);
                 }
 
                 return true;
