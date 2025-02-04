@@ -56,7 +56,6 @@ namespace CountdownNumberGame
                     Console.Clear();
 
                     bool shifted = false;
-                    bool removedNumber = false;
 
                     if (!string.IsNullOrEmpty(equation))
                     {
@@ -69,7 +68,9 @@ namespace CountdownNumberGame
                             {
                                 Console.WriteLine("You deleted {0} number(s)! +{1} points!", removedNums, 10 * removedNums);
                                 Console.WriteLine();
-                                removedNumber = true;
+                            }else
+                            {
+                                Console.WriteLine("the number {0} doesn't exist. -15 points.", result);
                             }
                         }
                         Console.WriteLine();
