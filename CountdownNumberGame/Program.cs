@@ -44,35 +44,60 @@ namespace CountdownNumberGame
                     Console.WriteLine();
                     Console.WriteLine("Current Score: " + score);
 
-                    string equation = RequestExpression();
-                    Console.Clear();
+                    //shift numbers to the right or delete numbers choice
+                    Console.WriteLine();
+                    bool removeOrShift = RemoveOrShift();
+                    Console.WriteLine();
+                    Console.WriteLine();
 
                     bool shifted = false;
 
-                    if (!string.IsNullOrEmpty(equation))
+                    if(removeOrShift)
                     {
-                        int? result = EvaluateExpression(equation, numbers.guessNumbers);
+                        string equation = RequestExpression();
 
-                        if(result.HasValue)
+                        Console.Clear();
+
+                        if (!string.IsNullOrEmpty(equation))
                         {
-                            int removedNums = numbers.RemoveNumber((int)result);
-                            if (result != null && removedNums != 0)
+                            int? result = EvaluateExpression(equation, numbers.guessNumbers);
+
+                            if (result.HasValue)
                             {
-                                Console.WriteLine("You deleted {0} {1} time(s)! +{2} points!", result, removedNums, 10 * removedNums);
-                            }else
-                            {
-                                Console.WriteLine("the number {0} doesn't exist. -15 points.", result);
+                                int removedNums = numbers.RemoveNumber((int)result);
+                                if (result != null && removedNums != 0)
+                                {
+                                    Console.WriteLine("You deleted {0} {1} time(s)! +{2} points!", result, removedNums, 10 * removedNums);
+
+                                    int operatorsUsed = CalculateOperatorsUsed(equation);
+                                    Console.WriteLine("You also used {0} operator(s). +{1} points!", operatorsUsed, 2 * operatorsUsed);
+                                    score += 2 * operatorsUsed;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("the number {0} doesn't exist. -15 points.", result);
+                                }
                             }
+                            Console.WriteLine();
                         }
-                        Console.WriteLine();
-                    }else
+                        else
+                        {
+                            score -= 15;
+                            Console.WriteLine("You didn't enter an expression. -15 points.");
+                            Console.WriteLine();
+                        }
+
+                        shifted = numbers.Shift();
+                    }
+                    else
                     {
-                        score -= 15;
-                        Console.WriteLine("You didn't enter an expression. -15 points.");
+                        numbers.ReverseShift();
+                        score -= 5;
+
+                        Console.WriteLine("You Shifted the numbers backward! But at the cost of 5 points.");
                         Console.WriteLine();
                     }
-
-                    shifted = numbers.Shift();
+                    
 
                     numbers.RandomizeGuessNumbers();
 
@@ -152,6 +177,12 @@ namespace CountdownNumberGame
 
                 }
 
+                public void ReverseShift()
+                {
+                    numbers.RemoveAt(numbers.Count);
+                    numbers.Insert(0, null);
+                }
+
                 public void ShowAllData()
                 {
                     Console.Write("|");
@@ -213,7 +244,6 @@ namespace CountdownNumberGame
 
             static string RequestExpression()
             {
-                Console.WriteLine();
                 Console.Write("Enter expression: ");
                 string input = Console.ReadLine();
 
@@ -452,6 +482,30 @@ namespace CountdownNumberGame
                 }
 
                 return true;
+            }
+
+            static int CalculateOperatorsUsed(string input)
+            {
+                int count = 0;
+                string[] operators = { "+", "-", "*", "/" };
+
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (operators.Contains(input[i].ToString()))
+                        count++;
+                }
+
+                return count;
+            }
+
+            static bool RemoveOrShift()
+            {
+                Console.Write("press Y to delete more numbers, or anything else to shift the numbers to the right at a penalty of 5 points: ");
+                ConsoleKey key = Console.ReadKey().Key;
+
+                if(key == ConsoleKey.Y)
+                    return true;
+                return false;
             }
         }
     }
