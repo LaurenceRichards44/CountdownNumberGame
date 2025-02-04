@@ -442,6 +442,8 @@ namespace CountdownNumberGame
 
                         if(removedNums.Contains(num))
                             Console.WriteLine(" more than {0} time(s).", removedNums.Count(x => x == num));
+                        else
+                            Console.WriteLine();
 
                         return false;
                     }
