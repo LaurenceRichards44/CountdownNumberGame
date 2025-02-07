@@ -16,7 +16,7 @@ namespace CountdownNumberGame
 
         static Dictionary<ConsoleKey, int[]> data = new Dictionary<ConsoleKey, int[]>()
             {
-                { ConsoleKey.P, new int[] {10, 50, 1, 11, 5, 1, 2, 2} },
+                { ConsoleKey.P, new int[] {10, 50, 1, 11, 5, 1, 2} },
                 { ConsoleKey.E, new int[] {10, 200, 1, 11, 4, 2, 2} },
                 { ConsoleKey.M, new int[] {100, 500, 1, 11, 4, 2, 1} },
                 { ConsoleKey.H, new int[] {100, 1000, 2, 11, 4, 1, 1} }
@@ -28,7 +28,7 @@ namespace CountdownNumberGame
 
             public void Start()
             {
-                Console.Write("Press the key corresponding to the first letter of each difficulty (practice, easy, medium, hard: ");
+                Console.Write("Press the key corresponding to the first letter of each difficulty (practice, easy, medium, hard): ");
                 ConsoleKey key = Console.ReadKey().Key;
 
                 GameNumbers numbers = new GameNumbers(data[key]);
@@ -52,7 +52,7 @@ namespace CountdownNumberGame
 
                     bool shifted = false;
 
-                    if(removeOrShift)
+                    if (removeOrShift)
                     {
                         string equation = RequestExpression();
 
@@ -64,6 +64,9 @@ namespace CountdownNumberGame
 
                             if (result.HasValue)
                             {
+
+
+
                                 int removedNums = numbers.RemoveNumber((int)result);
                                 if (result != null && removedNums != 0)
                                 {
@@ -75,7 +78,7 @@ namespace CountdownNumberGame
                                 }
                                 else
                                 {
-                                    Console.WriteLine("the number {0} doesn't exist. -15 points.", result);
+                                    Console.WriteLine("The number {0} doesn't exist. -15 points.", result);
                                 }
                             }
                             Console.WriteLine();
@@ -91,6 +94,8 @@ namespace CountdownNumberGame
                     }
                     else
                     {
+                        Console.Clear();
+
                         numbers.ReverseShift();
                         score -= 5;
 
@@ -99,7 +104,7 @@ namespace CountdownNumberGame
 
                         shifted = true;
                     }
-                    
+
 
                     numbers.RandomizeGuessNumbers();
 
@@ -163,7 +168,7 @@ namespace CountdownNumberGame
                 {
                     int lastIndex = numbers.LastIndexOf(null);
 
-                    if(shiftCount % shiftFrequency == 0)
+                    if (shiftCount % shiftFrequency == 0)
                     {
                         if (lastIndex > -1)
                         {
@@ -472,7 +477,7 @@ namespace CountdownNumberGame
                     {
                         Console.Write("Invalid Expression, you may not use the number {0}", num);
 
-                        if(removedNums.Contains(num))
+                        if (removedNums.Contains(num))
                             Console.WriteLine(" more than {0} time(s).", removedNums.Count(x => x == num));
                         else
                             Console.WriteLine();
@@ -502,12 +507,21 @@ namespace CountdownNumberGame
 
             static bool RemoveOrShift()
             {
-                Console.Write("press Y to delete more numbers, or anything else to shift the numbers to the right at a penalty of 5 points: ");
+                Console.Write("Press Y to delete more numbers, or anything else to shift the numbers to the right at a penalty of 5 points: ");
                 ConsoleKey key = Console.ReadKey().Key;
 
-                if(key == ConsoleKey.Y)
+                if (key == ConsoleKey.Y)
                     return true;
                 return false;
+            }
+
+            static bool SplitDigits(int num)
+            {
+                List<int> digits = new List<int>();
+
+                for (int i = 0; i < num.)
+
+                    Console.WriteLine("Press Y if you would like to split {0} to use in the next go, anything else to directly use ");
             }
         }
     }
